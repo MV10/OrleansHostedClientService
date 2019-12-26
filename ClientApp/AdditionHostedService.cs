@@ -19,7 +19,17 @@ namespace ClientApp
             this.client = client;
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            // since this is an event handler, the lambda's async void is acceptable
+            appLife.ApplicationStarted.Register(async () => await ExecuteAsync());
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+            => Task.CompletedTask;
+
+        private async Task ExecuteAsync()
         {
             Console.WriteLine("Addition service started.");
             var adder = client.GetGrain<IAdderGrain>(0);
@@ -27,10 +37,8 @@ namespace ClientApp
             var result = await adder.Add(10, 20);
             Console.WriteLine($"Grain invoked: 10 + 20 = {result}");
             Console.WriteLine("Calling StopApplicaton.");
+
             appLife.StopApplication();
         }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-            => Task.CompletedTask;
     }
 }

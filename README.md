@@ -10,32 +10,5 @@ Under Generic Host, the only way to reliably call `IClusterClient` close/dispose
 
 I threw this together after reading Reuben Bond's comment in [this](https://github.com/dotnet/orleans/issues/5758#issuecomment-540158401) Orleans discussion. It is by no means complete -- I believe we'd need support from configuration delegates (similar to `ISiloBuilder`) so that the consumer could identify application parts, handle logging, etc. (see TODO comments in AddClusterClientExtension for some trivial examples).
 
-As for Generic Host, putting the main program logic into a hosted service (`AdditionHostedService`) is only a few extra lines of code, and it cleanly provides DI support. When that logic is done, it signals the Generic Host to terminate the application. When you run the app, the console output shows that the sequence of events looks a bit strange (app shutdown is logged before app start, since the start-up process ends with the shutdown request), but everything works as expected. (Remember this is an Orleans app, you have to run SiloApp before running ClientApp.)
-
-```
-Main: AddOrleansClusterClient
-Starting AddOrleansClusterClient
-Trying to connect, 2 attempts remaining.
-Awaiting connect request.
-Is client reference null? False
-Main: RunConsoleAsync
-Main: Add ClusterClientHostedService
-Main: Add AdditionHostedService
-Cluster client service started.
-Addition service started.
-Grain reference obtained.
-Grain invoked: 10 + 20 = 30
-Calling StopApplicaton.
-info: Microsoft.Hosting.Lifetime[0]
-      Application is shutting down...
-info: Microsoft.Hosting.Lifetime[0]
-      Application started. Press Ctrl+C to shut down.
-info: Microsoft.Hosting.Lifetime[0]
-      Hosting environment: Production
-info: Microsoft.Hosting.Lifetime[0]
-      Content root path: C:\Source\OrleansHostedClientService\ClientApp\bin\Debug\netcoreapp3.1
-Cluster client service stopping.
-```
-
-Edit: Probably the work should be performed by handling the [`IHostApplicationLifetime.ApplicationStarted`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.hosting.ihostapplicationlifetime?view=dotnet-plat-ext-3.1) event instead of `StartAsync`... that should correct the out-of-sequence weirdness.
+As for Generic Host, putting the main program logic into a hosted service (`AdditionHostedService`) is only a few extra lines of code, and it cleanly provides DI support. When that logic is done, it signals the Generic Host to terminate the application. (Remember this is an Orleans app, you have to run SiloApp before running ClientApp.)
 
