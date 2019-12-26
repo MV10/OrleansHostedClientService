@@ -37,3 +37,5 @@ info: Microsoft.Hosting.Lifetime[0]
 Cluster client service stopping.
 ```
 
+Edit: Probably the work should be performed by handling the [`IHostApplicationLifetime.ApplicationStarted`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.hosting.ihostapplicationlifetime?view=dotnet-plat-ext-3.1) event instead of `StartAsync`... that should correct the out-of-sequence weirdness.
+
